@@ -70,4 +70,4 @@ CREATE TABLE habits (
 
     CONSTRAINT habit_fk FOREIGN KEY(user_id, goal_id)
             REFERENCES goals(user_id, goal_id)
-)
+);
