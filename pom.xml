@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>xyz.donit.rest</groupId>
     <artifactId>donit</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>donit</name>
     <url>http://maven.apache.org</url>
