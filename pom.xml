@@ -80,6 +80,12 @@
             <artifactId>google-api-client-appengine</artifactId>
             <version>1.22.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-java-sdk -->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-java-sdk</artifactId>
+            <version>1.9.48</version>
+        </dependency>
 
 
     </dependencies>
