@@ -3,6 +3,7 @@ package xyz.donit.rest.auth;
 import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.eclipse.jetty.server.HttpTransport;
@@ -126,7 +127,7 @@ public class GoogleSignInAuthFilter implements ContainerRequestFilter {
     private static final String GOOGLE_CLIENT_ID = "585773028239-rosufgk1oe6f9afhjdhn0qg2i418j0a6.apps.googleusercontent.com";
 
     private GoogleIdToken.Payload validateIdToken(String tokenString) throws AuthenticationException{
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(UrlFetchTransport.getDefaultInstance(), new JacksonFactory())
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID)).build();
         try{
             // verify the token
