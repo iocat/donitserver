@@ -3,8 +3,10 @@ package xyz.donit.rest;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.glassfish.hk2.api.Factory;
 
-public class DataSourceFactory implements Factory<BasicDataSource> {
-    private static BasicDataSource connectionPool;
+import javax.sql.DataSource;
+
+public class DataSourceFactory implements Factory<DataSource> {
+    private static DataSource connectionPool;
     private static final String JDBC_DRIVER = "org.postgresql.Driver";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
@@ -14,22 +16,23 @@ public class DataSourceFactory implements Factory<BasicDataSource> {
     public DataSourceFactory(){
         try {
             Class.forName(JDBC_DRIVER);
-            this.connectionPool = new BasicDataSource();
+            BasicDataSource ds = new BasicDataSource();
             String dbUrl = "jdbc:postgresql://" + HOST+":"+PORT + "/"+ DBNAME;
-            connectionPool.setUsername(USERNAME);
-            connectionPool.setDriverClassName("org.postgresql.Driver");
-            connectionPool.setUrl(dbUrl);
-            connectionPool.setInitialSize(1);
-            connectionPool.setDefaultAutoCommit(true);
+            ds.setUsername(USERNAME);
+            ds.setDriverClassName("org.postgresql.Driver");
+            ds.setUrl(dbUrl);
+            ds.setInitialSize(10);
+            ds.setDefaultAutoCommit(true);
+            this.connectionPool = ds;
         }catch (ClassNotFoundException e){
             e.printStackTrace();
         }
     }
 
-    public BasicDataSource provide(){
+    public DataSource provide(){
         return this.connectionPool;
     }
-    public void dispose(BasicDataSource  bds){
+    public void dispose(DataSource  bds){
 
     }
 }

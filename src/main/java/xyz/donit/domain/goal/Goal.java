@@ -1,11 +1,15 @@
 package xyz.donit.domain.goal;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.ser.std.ToStringSerializer;
 import xyz.donit.domain.client.VisibilityEnum;
 import xyz.donit.domain.exception.ResourceErrCode;
 import xyz.donit.domain.exception.ResourceException;
+import xyz.donit.utils.CustomDateSerializer;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class Goal {
@@ -13,22 +17,26 @@ public class Goal {
     private static final String QUERY_RETRIEVE_GOAL =
             "SELECT name, description, last_updated, img_url, done, visibility " +
                     "FROM goals WHERE user_id = ? AND goal_id = ?";
+    @JsonSerialize(using = ToStringSerializer.class)
     private long id = 0;
     private String name = "";
     private String description = "";
-    private Timestamp lastUpdated;
+
+    @JsonSerialize(using = CustomDateSerializer.class)
+    private Instant lastUpdated;
+
     private boolean done = false;
-    private String imgUrl = "";
+    private String img = "";
     private ArrayList<Habit> habits = new ArrayList<>();
     private ArrayList<Task> tasks = new ArrayList<>();
 
-    public Goal(long id, String name, String description, Timestamp lastUpdated, boolean done, String imgUrl, ArrayList<Habit> habits, ArrayList<Task> tasks, VisibilityEnum visibility) {
+    public Goal(long id, String name, String description, Instant lastUpdated, boolean done, String img, ArrayList<Habit> habits, ArrayList<Task> tasks, VisibilityEnum visibility) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.lastUpdated = lastUpdated;
         this.done = done;
-        this.imgUrl = imgUrl;
+        this.img = img;
         this.habits = habits;
         this.tasks = tasks;
         this.visibility = visibility;
@@ -50,13 +58,13 @@ public class Goal {
         this.tasks = tasks;
     }
 
-    public Goal(long id, String name, String description, Timestamp lastUpdated, boolean done, String imgUrl, VisibilityEnum visibility) {
+    public Goal(long id, String name, String description, Instant lastUpdated, boolean done, String img, VisibilityEnum visibility) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.lastUpdated = lastUpdated;
         this.done = done;
-        this.imgUrl = imgUrl;
+        this.img = img;
         this.visibility = visibility;
     }
 
@@ -85,10 +93,10 @@ public class Goal {
     public void setDescription(String description) {
         this.description = description;
     }
-    public Timestamp getLastUpdated() {
+    public Instant getLastUpdated() {
         return lastUpdated;
     }
-    public void setLastUpdated(Timestamp lastUpdated) {
+    public void setLastUpdated(Instant lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
     public boolean isDone() {
@@ -97,11 +105,11 @@ public class Goal {
     public void setDone(boolean done) {
         this.done = done;
     }
-    public String getImgUrl() {
-        return imgUrl;
+    public String getImg() {
+        return img;
     }
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setImg(String img) {
+        this.img = img;
     }
     public VisibilityEnum getVisibility() {
         return visibility;
@@ -133,17 +141,16 @@ public class Goal {
             stmt.setLong(1, userId);
             stmt.setString(2,name);
             stmt.setString(3, description);
-            stmt.setString(4, imgUrl);
+            stmt.setString(4, img);
             stmt.setBoolean(5, done);
             stmt.setInt(6, visibility.ordinal());
             try(ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next()) {
                     conn.rollback();
-                    conn.setAutoCommit(true);
                     throw new ResourceException(ResourceErrCode.CANNOT_STORE,"no generated keys");
                 }
                 this.id = rs.getLong(1);
-                this.lastUpdated = rs.getTimestamp(2);
+                this.lastUpdated = rs.getTimestamp(2).toInstant();
             }
             try {
                 for (Task task : this.tasks) {
@@ -154,11 +161,9 @@ public class Goal {
                 }
             }catch (ResourceException e){
                 conn.rollback();
-                conn.setAutoCommit(true);
                 throw e;
             }
             conn.commit();
-            conn.setAutoCommit(true);
         }catch (SQLException e){
             e.printStackTrace();
             throw new ResourceException(ResourceErrCode.CANNOT_STORE, e.getMessage());
@@ -172,11 +177,9 @@ public class Goal {
                 retrieve(conn, userId);
             }catch (ResourceException e){
                 conn.rollback();
-                conn.setAutoCommit(true);
                 throw e;
             }
             conn.commit();
-            conn.setAutoCommit(true);
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -193,8 +196,8 @@ public class Goal {
                 }
                 this.name =  rs.getString(1);
                 this.description = rs.getString(2);
-                this.lastUpdated = rs.getTimestamp(3);
-                this.imgUrl = rs.getString(4);
+                this.lastUpdated = rs.getTimestamp(3).toInstant();
+                this.img = rs.getString(4);
                 this.done = rs.getBoolean(5);
                 this.visibility = VisibilityEnum.values()[rs.getInt(6)];
             }
@@ -228,11 +231,9 @@ public class Goal {
                 goals = getGoalsByIds(conn, ids, userId);
             }catch (ResourceException e){
                 conn.rollback();
-                conn.setAutoCommit(true);
                 throw e;
             }
             conn.commit();
-            conn.setAutoCommit(true);
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -268,11 +269,9 @@ public class Goal {
                 goals = getGoalsByIds(conn, ids, userId);
             }catch (ResourceException e){
                 conn.rollback();
-                conn.setAutoCommit(true);
                 throw e;
             }
             conn.commit();
-            conn.setAutoCommit(true);
         }catch (SQLException e){
             e.printStackTrace();
         }

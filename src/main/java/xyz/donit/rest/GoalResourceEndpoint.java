@@ -1,16 +1,14 @@
 package xyz.donit.rest;
 
 import javax.inject.Inject;
-import javax.print.attribute.standard.Media;
+import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import xyz.donit.domain.goal.Goal;
 import xyz.donit.domain.exception.ResourceException;
 import xyz.donit.rest.auth.GoogleTokenIDSecured;
-import xyz.donit.rest.auth.UserIdAuthorized;
 
 import java.util.ArrayList;
 
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 @Path("/users/{userid}/goals")
 public class GoalResourceEndpoint {
     @Inject
-    BasicDataSource db;
+    DataSource db;
 
     private static Response constructResponse(ResourceException e){
         return Response.status(e.getHTTPCode()).entity(e.getLocalizedMessage()).build();
@@ -67,6 +65,7 @@ public class GoalResourceEndpoint {
             goal.store(db, userId);
             return Response.status(200).entity(goal).build();
         }catch (ResourceException e){
+            e.printStackTrace();
             return constructResponse(e);
         }
     }

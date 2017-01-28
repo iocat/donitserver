@@ -1,12 +1,16 @@
 package xyz.donit.domain.goal;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.ser.std.ToStringSerializer;
+
 /**
  * Created by felix on 1/11/17.
  */
 public class Doable {
+    @JsonSerialize(using = ToStringSerializer.class)
     private long id;
     private String name;
-    private boolean done;
+    private boolean done = false;
     private long duration;
     public Doable(){}
 

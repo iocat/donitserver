@@ -1,12 +1,11 @@
 package xyz.donit.rest;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import xyz.donit.domain.client.User;
 import xyz.donit.domain.exception.ResourceException;
 import xyz.donit.rest.auth.GoogleTokenIDSecured;
-import xyz.donit.rest.auth.UserIdAuthorized;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,7 +13,7 @@ import javax.ws.rs.core.Response;
 @Path("/users")
 public class UserResourceEndpoint {
     @Inject
-    BasicDataSource db;
+    DataSource db;
 
     @GET
     @Path("{userid}")

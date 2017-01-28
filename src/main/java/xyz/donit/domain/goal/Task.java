@@ -1,9 +1,15 @@
 package xyz.donit.domain.goal;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.ser.std.DateSerializer;
 import xyz.donit.domain.exception.ResourceErrCode;
 import xyz.donit.domain.exception.ResourceException;
+import xyz.donit.utils.CustomDateDeserializer;
+import xyz.donit.utils.CustomDateSerializer;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 
 /**
@@ -12,20 +18,20 @@ import java.util.ArrayList;
 public class Task extends Doable{
     public Task(){}
 
-    public Timestamp getAt() {
-        return at;
+    public Instant getRemindAt() {
+        return remindAt;
+    }
+    public void setRemindAt(Instant remindAt) {
+        this.remindAt = remindAt;
     }
 
-    public void setAt(Timestamp at) {
-        this.at = at;
-    }
-
-    public Task(long id, String name, boolean done, long duration, Timestamp at) {
+    public Task(long id, String name, boolean done, long duration, Instant at) {
         super(id, name, done, duration);
-        this.at = at;
+        this.remindAt = at;
     }
-
-    private Timestamp at;
+    @JsonSerialize(using = CustomDateSerializer.class)
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    private Instant remindAt;
     private static final String QUERY_STORE_TASK = "INSERT INTO tasks (user_id, goal_id, task_id, name, done, at, duration) VALUES " +
             "(?,?,?,?,?,?,?)";
     public void store(Connection conn, long userId, long goalId) throws ResourceException{
@@ -35,7 +41,7 @@ public class Task extends Doable{
             stmt.setLong(3, this.getId());
             stmt.setString(4, this.getName());
             stmt.setBoolean(5, this.isDone());
-            stmt.setTimestamp(6, this.at);
+            stmt.setTimestamp(6, Timestamp.from(this.remindAt));
             stmt.setLong(7, getDuration());
             int count = stmt.executeUpdate();
             if (count != 1){
@@ -56,7 +62,7 @@ public class Task extends Doable{
             try(ResultSet rs = stmt.executeQuery()){
                 while(rs.next()){
                     Task task = new Task(rs.getLong(1), rs.getString(2),
-                            rs.getBoolean(3),rs.getLong(4), rs.getTimestamp(5));
+                            rs.getBoolean(3),rs.getLong(4), rs.getTimestamp(5).toInstant());
                     tasks.add(task);
                 }
             }

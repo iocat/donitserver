@@ -11,12 +11,12 @@ SET DATABASE = donit;
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
 
-    username CHAR(20) ,
-    email CHAR(256) NOT NULL,
+    username STRING ,
+    email CHAR(256),
 
     join_at TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-    auth_pass CHAR(256) NOT NULL,
-    auth_salt CHAR(20) NOT NULL,
+    auth_pass CHAR(256),
+    auth_salt CHAR(20),
 
     CONSTRAINT uname_uid UNIQUE(username)
 );
@@ -44,7 +44,7 @@ CREATE TABLE tasks(
     name CHAR(60) NOT NULL,
     done BOOL NOT NULL,
     /* when to remind for a task */
-    at TIMESTAMP,
+    remindAt TIMESTAMP,
     /* duration of this task in minutes */
     duration INT NOT NULL,
     CONSTRAINT valid_task_duration CHECK (duration < 86400),
