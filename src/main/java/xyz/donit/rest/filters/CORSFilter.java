@@ -12,6 +12,7 @@ import java.io.IOException;
 /**
  * Created by felix on 1/27/17.
  */
+@Provider
 public class CORSFilter implements ContainerResponseFilter {
     @Override
     public void filter(final ContainerRequestContext res,
